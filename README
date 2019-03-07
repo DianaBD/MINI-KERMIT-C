@@ -1,0 +1,83 @@
+
+   ======= Brodoceanu Diana 322CC ==========================================================
+  |                                                                                         |
+  |                               README - Tema1 PC - MINI-KERMIT                           |
+  |                                                                                         |
+   =========================================================================================
+
+   >> Structuri definite <<
+
+	      - pkt_kermit -> cu campurile pachetului MINI KERMIT
+        - data_S -> cu campurile pachetului MINI KERMIT de tip S
+
+
+   >> Functii definite <<
+        0) void initialize_kermit(pkt_kermit *p) -> intoarce o structura de tipul 
+          pkt_kermit cu campurile intializate la valorile specificate in enuntul temei
+
+        1) msg make_package_S() -> intoarce o structura de tipul data_S cu campurile
+          intializate la valorile specificate in enuntul temei
+
+        2) msg make_package_F(char *file_name, int seq) -> intoarce o structura de tipul 
+          msg avand in payload un pachet MINI-KERMIT de tip 'F'  
+
+        3) msg make_package_D(char *buf, char seq, char len) -> intoarce o structura de tipul 
+          msg avand in payload un pachet MINI-KERMIT de tip 'D' 
+
+        4) msg make_null_data_package(char seq, char type) -> intoarce o structura de tipul 
+          msg avand in payload un pachet MINI-KERMIT de tip 'Z' sau 'B'
+
+        5) int check_crc(msg r) -> calculeaza suma de control pt pachetul MINI_KERMIT
+          din payload si il compara cu suma primita
+
+        6)void update_packet(msg *t,int secv) functie utila in caz de pachete corupte
+          pentru a recalcula suma de control dupa ce am incrementat secventa
+
+
+   >> Constante definite <<
+
+        Ksender -> starile prin care trece [ksender] pe durata comunicatiei
+          send_init 1
+          send_file 2
+          send_data 3
+          send_EOT 4
+          send_EOF 5
+          stop 6
+
+        Kreceiver -> starile prin care trece [kreceiver] pe durata comunicatiei
+          receive_init 1
+          receive_file 2
+          receive_data 3
+          received_EOT 4
+
+
+   >> Principiu de functionare <<
+
+        Ksender:
+          - trimite init pana cand primeste ACK pentru init => trece in starea send-file
+          - trimite primul file-heder
+          - cat timp nu s-a incheiat transmisia & nu s-a facut timeout de 3 ori consecutiv
+          - in caz ca primeste ACK cu secventa asteptata se orienteaza ce pachet 
+          trimite in continuarein functie de starea in care se afla
+          - in caz ca primeste NAK cu secventa asteptata incrementeaza secventa si 
+          recalculeaza suma, apoi retransmite
+          - in caz ca nu primeste nimic retransmite ultimul pachet
+
+        Kreceiver:
+          - asteapta un mesaj
+          - dupa ce a primit primul init, in caz acesta e corupt, asteapta un init bun
+          - trece in starea recv_file
+          - in caz ca primeste pachet necorupt cu secventa asteptata se orienteaza ce face 
+          cu acesta in continuare in functie de starea in care se afla
+          - in caz ca nu primeste nimic sau primeste secventa gresita retransmite ultimul pachet
+
+
+   >> Observatii <<
+
+        1) ACK si NAK se trimit cu numarul de secventa corespunzator pachetului primit
+        2) uneori file3.bin si recv_file3.bin difera, am incercat sa folosesc cmp si sa ma uit in 
+        fisiere dupa ce e diferit dar nu am gasit :))
+
+
+
+
